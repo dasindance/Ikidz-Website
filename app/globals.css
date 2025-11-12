@@ -1,0 +1,103 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Poppins:wght@300;400;500;600;700&display=swap');
+
+@layer base {
+  :root {
+    /* iKids vibrant color scheme */
+    --background: 42 100% 97%;  /* Soft cream */
+    --foreground: 222.2 47.4% 11.2%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 47.4% 11.2%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 47.4% 11.2%;
+    --primary: 0 100% 70%;  /* Vibrant orange #FF6B6B */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 177 65% 54%;  /* Bright blue #4ECDC4 */
+    --secondary-foreground: 0 0% 100%;
+    --muted: 42 100% 95%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 48 100% 71%;  /* Sunny yellow #FFE66D */
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 0 100% 70%;
+    --radius: 1rem;
+    
+    /* Custom fonts */
+    --font-display: 'Fredoka One', cursive;
+    --font-body: 'Poppins', sans-serif;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-body;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display;
+  }
+}
+
+@layer components {
+  /* Fun card effect */
+  .card-fun {
+    @apply rounded-2xl shadow-fun hover:shadow-fun-lg transition-all duration-300 hover:-translate-y-1;
+  }
+  
+  /* Gradient backgrounds */
+  .bg-gradient-ikids {
+    background: linear-gradient(135deg, #FF6B6B 0%, #4ECDC4 100%);
+  }
+  
+  .bg-gradient-fun {
+    background: linear-gradient(135deg, #FFE66D 0%, #95E1D3 100%);
+  }
+  
+  /* Button effects */
+  .btn-fun {
+    @apply rounded-2xl font-semibold transition-all duration-200 hover:scale-105 active:scale-95;
+  }
+  
+  /* Achievement badge glow */
+  .badge-glow {
+    animation: glow 2s ease-in-out infinite alternate;
+  }
+  
+  @keyframes glow {
+    from {
+      box-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
+    }
+    to {
+      box-shadow: 0 0 20px rgba(255, 107, 107, 0.8);
+    }
+  }
+  
+  /* Star animation for achievements */
+  .star-burst {
+    animation: burst 0.6s ease-out;
+  }
+  
+  @keyframes burst {
+    0% {
+      transform: scale(0) rotate(0deg);
+      opacity: 0;
+    }
+    50% {
+      transform: scale(1.2) rotate(180deg);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1) rotate(360deg);
+      opacity: 1;
+    }
+  }
+}
+

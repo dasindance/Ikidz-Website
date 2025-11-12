@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: classroom-portal-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: classroom
+      POSTGRES_PASSWORD: classroom_password_change_me
+      POSTGRES_DB: classroom_portal
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U classroom"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Next.js Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: classroom-portal-app
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      # Database
+      DATABASE_URL: postgresql://classroom:classroom_password_change_me@postgres:5432/classroom_portal?schema=public
+      
+      # NextAuth
+      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+      
+      # AWS S3 / Cloudflare R2
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_REGION: ${AWS_REGION}
+      AWS_S3_BUCKET_NAME: ${AWS_S3_BUCKET_NAME}
+      AWS_ENDPOINT: ${AWS_ENDPOINT}
+      
+      # Email
+      RESEND_API_KEY: ${RESEND_API_KEY}
+      EMAIL_FROM: ${EMAIL_FROM}
+      
+      # App Settings
+      NEXT_PUBLIC_APP_NAME: Classroom Portal
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      
+      # Cron
+      CRON_SECRET: ${CRON_SECRET}
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./prisma:/app/prisma
+    command: sh -c "npx prisma migrate deploy && node server.js"
+
+volumes:
+  postgres_data:
+    driver: local
+

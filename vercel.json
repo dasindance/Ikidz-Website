@@ -1,0 +1,13 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/check-memberships",
+      "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/cron/check-homework",
+      "schedule": "0 18 * * *"
+    }
+  ]
+}
+
