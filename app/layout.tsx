@@ -6,8 +6,11 @@ import { Providers } from '@/components/providers'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Classroom Portal',
-  description: 'Parent and Teacher Classroom Management Portal',
+  title: 'iKids Portal - ESL Management',
+  description: 'iKids ESL Management Portal for Parents and Teachers',
+  keywords: ['iKids', 'ESL', 'English', 'Learning', 'Education'],
+  authors: [{ name: 'iKids' }],
+  themeColor: '#FF6B6B',
 }
 
 export default function RootLayout({
