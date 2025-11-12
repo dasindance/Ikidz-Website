@@ -91,11 +91,18 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          <div className="mt-6 p-4 bg-muted rounded-md">
-            <p className="text-sm font-semibold mb-2">Demo Accounts:</p>
-            <div className="text-xs space-y-1">
-              <p>Teacher: teacher@example.com / teacher123</p>
-              <p>Parent: parent@example.com / parent123</p>
+          <div className="mt-6 p-4 bg-gradient-fun/20 rounded-2xl">
+            <p className="text-sm font-semibold mb-3 text-center">Demo Accounts:</p>
+            <div className="text-sm space-y-2">
+              <div className="p-2 bg-white rounded-xl">
+                <p className="font-medium">🛡️ Admin: admin@ikids.com / admin123</p>
+              </div>
+              <div className="p-2 bg-white rounded-xl">
+                <p className="font-medium">👨‍🏫 Teacher: teacher@example.com / teacher123</p>
+              </div>
+              <div className="p-2 bg-white rounded-xl">
+                <p className="font-medium">👨‍👩‍👧 Parent: parent@example.com / parent123</p>
+              </div>
             </div>
           </div>
         </CardContent>
