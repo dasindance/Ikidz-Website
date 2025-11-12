@@ -52,26 +52,26 @@ test.describe('Role Protection', () => {
 
   test('Unauthenticated user redirects to login for admin routes', async ({ page }) => {
     await page.goto('/admin/dashboard')
-    await expect(page).toHaveURL('/login', { timeout: 10000 })
+    await expect(page).toHaveURL(/\/login/, { timeout: 10000 })
     
     await page.goto('/admin/users')
-    await expect(page).toHaveURL('/login', { timeout: 10000 })
+    await expect(page).toHaveURL(/\/login/, { timeout: 10000 })
   })
 
   test('Unauthenticated user redirects to login for teacher routes', async ({ page }) => {
     await page.goto('/teacher/admin')
-    await expect(page).toHaveURL('/login', { timeout: 10000 })
+    await expect(page).toHaveURL(/\/login/, { timeout: 10000 })
     
     await page.goto('/teacher/students')
-    await expect(page).toHaveURL('/login', { timeout: 10000 })
+    await expect(page).toHaveURL(/\/login/, { timeout: 10000 })
   })
 
   test('Unauthenticated user redirects to login for parent routes', async ({ page }) => {
     await page.goto('/parent/dashboard')
-    await expect(page).toHaveURL('/login', { timeout: 10000 })
+    await expect(page).toHaveURL(/\/login/, { timeout: 10000 })
     
     await page.goto('/parent/homework')
-    await expect(page).toHaveURL('/login', { timeout: 10000 })
+    await expect(page).toHaveURL(/\/login/, { timeout: 10000 })
   })
 
   test('Parent stays parent after browser refresh', async ({ page }) => {

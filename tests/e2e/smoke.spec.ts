@@ -10,8 +10,8 @@ test.describe('Smoke Tests', () => {
     await page.goto('/login')
     await page.waitForLoadState('networkidle')
     
-    // Should see iKids branding
-    await expect(page.locator('text=iKids')).toBeVisible()
+    // Should see iKids branding (use .first() since text appears multiple times)
+    await expect(page.locator('text=iKids').first()).toBeVisible()
     
     // Should see login form
     await expect(page.locator('input[type="email"]')).toBeVisible()
@@ -19,7 +19,7 @@ test.describe('Smoke Tests', () => {
     await expect(page.locator('button[type="submit"]')).toBeVisible()
     
     // Should see demo accounts
-    await expect(page.locator('text=Admin: admin@ikids.com')).toBeVisible()
+    await expect(page.locator('text=Admin: admin@ikids.com').first()).toBeVisible()
   })
 
   test('Can attempt admin login', async ({ page }) => {

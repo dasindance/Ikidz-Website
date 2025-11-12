@@ -12,13 +12,11 @@ export async function loginAsAdmin(page: Page) {
   await page.fill('input[type="email"]', 'admin@ikids.com')
   await page.fill('input[type="password"]', 'admin123')
   
-  // Click and wait for navigation
-  await Promise.all([
-    page.waitForURL('/admin/dashboard', { timeout: 30000 }),
-    page.click('button[type="submit"]')
-  ])
+  // Click submit and wait for redirect (goes to / then to /admin/dashboard)
+  await page.click('button[type="submit"]')
   
-  // Wait for page to fully load
+  // Wait for final URL (might go through / first)
+  await page.waitForURL('/admin/dashboard', { timeout: 30000 })
   await page.waitForLoadState('networkidle')
 }
 
@@ -29,13 +27,11 @@ export async function loginAsTeacher(page: Page) {
   await page.fill('input[type="email"]', 'teacher@example.com')
   await page.fill('input[type="password"]', 'teacher123')
   
-  // Click and wait for navigation
-  await Promise.all([
-    page.waitForURL('/teacher/admin', { timeout: 30000 }),
-    page.click('button[type="submit"]')
-  ])
+  // Click submit and wait for redirect
+  await page.click('button[type="submit"]')
   
-  // Wait for page to fully load
+  // Wait for final URL
+  await page.waitForURL('/teacher/admin', { timeout: 30000 })
   await page.waitForLoadState('networkidle')
 }
 
@@ -46,13 +42,11 @@ export async function loginAsParent(page: Page, email: string, password: string)
   await page.fill('input[type="email"]', email)
   await page.fill('input[type="password"]', password)
   
-  // Click and wait for navigation
-  await Promise.all([
-    page.waitForURL('/parent/dashboard', { timeout: 30000 }),
-    page.click('button[type="submit"]')
-  ])
+  // Click submit and wait for redirect
+  await page.click('button[type="submit"]')
   
-  // Wait for page to fully load
+  // Wait for final URL
+  await page.waitForURL('/parent/dashboard', { timeout: 30000 })
   await page.waitForLoadState('networkidle')
 }
 
