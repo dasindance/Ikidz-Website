@@ -8,10 +8,23 @@ export default withAuth(
 
     // Redirect to appropriate dashboard if accessing root
     if (path === '/') {
+      if (token?.role === 'ADMIN') {
+        return NextResponse.redirect(new URL('/admin/dashboard', req.url))
+      }
       if (token?.role === 'TEACHER') {
         return NextResponse.redirect(new URL('/teacher/admin', req.url))
       }
       return NextResponse.redirect(new URL('/parent/dashboard', req.url))
+    }
+
+    // Allow ADMIN to access everything
+    if (token?.role === 'ADMIN') {
+      return NextResponse.next()
+    }
+
+    // Protect admin routes (only ADMIN can access)
+    if (path.startsWith('/admin')) {
+      return NextResponse.redirect(new URL('/login', req.url))
     }
 
     // Protect teacher routes
