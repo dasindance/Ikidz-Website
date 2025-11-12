@@ -1,6 +1,10 @@
 {
   "crons": [
     {
+      "path": "/api/cron/daily-countdown",
+      "schedule": "0 9 * * *"
+    },
+    {
       "path": "/api/cron/check-memberships",
       "schedule": "0 9 * * *"
     },

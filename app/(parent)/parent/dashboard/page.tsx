@@ -4,7 +4,10 @@ import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/db'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { formatDate } from '@/lib/utils'
+import { ClassCountdown } from '@/components/ClassCountdown'
+import Link from 'next/link'
 import {
   BookOpen,
   FileText,
@@ -12,6 +15,8 @@ import {
   AlertCircle,
   CheckCircle,
   Users,
+  Upload,
+  Sparkles,
 } from 'lucide-react'
 
 async function getDashboardData(userId: string) {
@@ -114,135 +119,77 @@ export default async function ParentDashboard() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold">Welcome, {session.user.name}!</h1>
-        <p className="text-muted-foreground mt-2">
-          Here's what's happening with your student's classes
+      {/* Welcome Header */}
+      <div className="text-center py-6">
+        <h1 className="text-5xl font-display bg-gradient-ikids bg-clip-text text-transparent mb-2">
+          Welcome, {session.user.name}! 👋
+        </h1>
+        <p className="text-lg text-muted-foreground">
+          Let's check on your student's progress
         </p>
       </div>
 
-      {/* Students Overview */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {data.students.map((student) => (
-          <Card key={student.id}>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Users className="mr-2 h-5 w-5" />
-                {student.name}
+      {/* Class Countdown Cards - Most Important! */}
+      <div className="grid gap-6 md:grid-cols-2">
+        {data.students.flatMap((student) =>
+          student.enrollments.map((enrollment) => (
+            <ClassCountdown
+              key={enrollment.id}
+              studentName={student.name}
+              className={enrollment.class.name}
+              classesRemaining={enrollment.classesRemaining}
+              totalClasses={enrollment.totalClasses}
+              renewalDate={enrollment.renewalDate}
+            />
+          ))
+        )}
+      </div>
+
+      {/* Quick Actions */}
+      <div className="grid gap-4 md:grid-cols-3">
+        <Button asChild className="h-24 btn-fun bg-gradient-ikids text-lg">
+          <Link href="/parent/homework">
+            <div className="text-center">
+              <Upload className="h-8 w-8 mx-auto mb-2" />
+              <span>Submit Homework</span>
+            </div>
+          </Link>
+        </Button>
+        <Button asChild className="h-24 btn-fun bg-ikids-blue text-white text-lg" variant="secondary">
+          <Link href="/parent/lessons">
+            <div className="text-center">
+              <BookOpen className="h-8 w-8 mx-auto mb-2" />
+              <span>View Lessons</span>
+            </div>
+          </Link>
+        </Button>
+        <Button asChild className="h-24 btn-fun bg-ikids-yellow text-gray-800 text-lg" variant="outline">
+          <Link href="/parent/calendar">
+            <div className="text-center">
+              <CalendarIcon className="h-8 w-8 mx-auto mb-2" />
+              <span>Calendar</span>
+            </div>
+          </Link>
+        </Button>
+      </div>
+
+      {/* Upcoming Homework - Simplified */}
+      {data.upcomingHomework.length > 0 && (
+        <Card className="card-fun border-2 border-ikids-orange/20">
+          <CardHeader className="bg-ikids-orange/5">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-2xl flex items-center gap-2">
+                <FileText className="h-6 w-6 text-ikids-orange" />
+                Homework Due Soon
               </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {student.enrollments.map((enrollment) => {
-                  const needsRenewal = enrollment.classesRemaining <= 2
-                  return (
-                    <div
-                      key={enrollment.id}
-                      className="flex items-center justify-between p-3 bg-muted rounded-lg"
-                    >
-                      <div>
-                        <p className="font-medium text-sm">
-                          {enrollment.class.name}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {enrollment.classesRemaining} classes left
-                        </p>
-                      </div>
-                      {needsRenewal && (
-                        <Badge variant="destructive">
-                          <AlertCircle className="mr-1 h-3 w-3" />
-                          Renewal Due
-                        </Badge>
-                      )}
-                    </div>
-                  )
-                })}
-                {student.enrollments.length === 0 && (
-                  <p className="text-sm text-muted-foreground">
-                    Not enrolled in any classes
-                  </p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Quick Stats */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Upcoming Homework
-            </CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {data.upcomingHomework.length}
+              <Badge className="bg-ikids-orange">
+                {data.upcomingHomework.length}
+              </Badge>
             </div>
-            <p className="text-xs text-muted-foreground">
-              assignments to complete
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Recent Lessons
-            </CardTitle>
-            <BookOpen className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{data.recentLessons.length}</div>
-            <p className="text-xs text-muted-foreground">
-              lessons this week
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Notifications
-            </CardTitle>
-            <AlertCircle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {data.unreadNotifications.length}
-            </div>
-            <p className="text-xs text-muted-foreground">unread</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Upcoming Holidays
-            </CardTitle>
-            <CalendarIcon className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {data.upcomingHolidays.length}
-            </div>
-            <p className="text-xs text-muted-foreground">this month</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Upcoming Homework */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Upcoming Homework</CardTitle>
-          <CardDescription>Assignments due soon</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {data.upcomingHomework.length > 0 ? (
-            <div className="space-y-4">
-              {data.upcomingHomework.map((homework) => {
+          <CardContent className="pt-6">
+            <div className="space-y-3">
+              {data.upcomingHomework.slice(0, 3).map((homework) => {
                 const isSubmitted = homework.submissions.some((s) =>
                   data.students.some((st) =>
                     st.homeworkSubmissions.some(
@@ -253,81 +200,125 @@ export default async function ParentDashboard() {
                 return (
                   <div
                     key={homework.id}
-                    className="flex items-start justify-between p-4 border rounded-lg"
+                    className="flex items-center justify-between p-4 bg-muted rounded-2xl hover:shadow-fun transition-all"
                   >
                     <div className="flex-1">
-                      <h4 className="font-semibold">{homework.title}</h4>
+                      <h4 className="font-semibold text-lg">{homework.title}</h4>
                       <p className="text-sm text-muted-foreground mt-1">
-                        {homework.description}
+                        Due: {formatDate(homework.dueDate)}
                       </p>
-                      <div className="flex items-center gap-4 mt-2">
-                        <Badge variant="outline">
-                          {homework.class.name}
-                        </Badge>
-                        <span className="text-sm text-muted-foreground">
-                          Due: {formatDate(homework.dueDate)}
-                        </span>
-                      </div>
                     </div>
-                    {isSubmitted && (
-                      <Badge>
-                        <CheckCircle className="mr-1 h-3 w-3" />
-                        Submitted
+                    {isSubmitted ? (
+                      <Badge className="bg-ikids-green text-white">
+                        <CheckCircle className="mr-1 h-4 w-4" />
+                        Done!
                       </Badge>
+                    ) : (
+                      <Button asChild size="sm" className="btn-fun bg-ikids-orange">
+                        <Link href={`/parent/homework/${homework.id}/submit`}>
+                          Submit
+                        </Link>
+                      </Button>
                     )}
                   </div>
                 )
               })}
+              {data.upcomingHomework.length > 3 && (
+                <Button asChild variant="ghost" className="w-full">
+                  <Link href="/parent/homework">
+                    View all {data.upcomingHomework.length} assignments →
+                  </Link>
+                </Button>
+              )}
             </div>
-          ) : (
-            <p className="text-muted-foreground text-center py-8">
-              No upcoming homework assignments
-            </p>
-          )}
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
-      {/* Recent Lessons */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent Lessons</CardTitle>
-          <CardDescription>What your student learned recently</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {data.recentLessons.length > 0 ? (
-            <div className="space-y-4">
-              {data.recentLessons.map((lesson) => (
-                <div key={lesson.id} className="border-l-4 border-primary pl-4 py-2">
+      {/* Last Lesson - Simplified */}
+      {data.recentLessons.length > 0 && (
+        <Card className="card-fun">
+          <CardHeader className="bg-ikids-blue/5">
+            <CardTitle className="text-2xl flex items-center gap-2">
+              <Sparkles className="h-6 w-6 text-ikids-blue" />
+              Last Lesson
+            </CardTitle>
+            <CardDescription>What your student learned most recently</CardDescription>
+          </CardHeader>
+          <CardContent className="pt-6">
+            {(() => {
+              const lesson = data.recentLessons[0]
+              return (
+                <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <h4 className="font-semibold">{lesson.unit}</h4>
-                    <Badge variant="outline">{lesson.class.name}</Badge>
+                    <div>
+                      <h3 className="text-xl font-semibold">{lesson.unit}</h3>
+                      {lesson.bookSeries && (
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {lesson.bookSeries} - {lesson.bookLevel}
+                          {lesson.pageNumbers && ` (Pages ${lesson.pageNumbers})`}
+                        </p>
+                      )}
+                      <p className="text-sm text-muted-foreground">
+                        {formatDate(lesson.date)} • {lesson.class.name}
+                      </p>
+                    </div>
                   </div>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {formatDate(lesson.date)}
-                  </p>
-                  <div className="mt-2">
-                    <p className="text-sm font-medium mb-1">Topics covered:</p>
-                    <ul className="list-disc list-inside text-sm text-muted-foreground">
-                      {lesson.topics.map((topic, idx) => (
-                        <li key={idx}>{topic}</li>
-                      ))}
-                    </ul>
-                  </div>
-                  {lesson.notes && (
-                    <p className="text-sm text-muted-foreground mt-2 italic">
-                      Note: {lesson.notes}
-                    </p>
+
+                  {lesson.topics.length > 0 && (
+                    <div className="p-4 bg-ikids-yellow/10 rounded-2xl">
+                      <p className="font-medium mb-2">📝 Topics:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {lesson.topics.map((topic, idx) => (
+                          <Badge key={idx} variant="outline" className="rounded-xl">
+                            {topic}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
                   )}
+
+                  {lesson.vocabulary && lesson.vocabulary.length > 0 && (
+                    <div className="p-4 bg-ikids-green/10 rounded-2xl">
+                      <p className="font-medium mb-2">📚 New Vocabulary:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {lesson.vocabulary.map((word, idx) => (
+                          <span key={idx} className="px-3 py-1 bg-white rounded-xl text-sm font-medium">
+                            {word}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {lesson.skills && lesson.skills.length > 0 && (
+                    <div className="flex gap-2 flex-wrap">
+                      {lesson.skills.map((skill, idx) => (
+                        <Badge key={idx} className="bg-ikids-purple text-white rounded-xl">
+                          {skill}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+
+                  {lesson.notes && (
+                    <div className="p-4 bg-muted rounded-2xl">
+                      <p className="text-sm italic">"{ lesson.notes}"</p>
+                      <p className="text-xs text-muted-foreground mt-2">- Teacher's note</p>
+                    </div>
+                  )}
+
+                  <Button asChild variant="outline" className="w-full rounded-xl">
+                    <Link href="/parent/lessons">
+                      View All Lessons →
+                    </Link>
+                  </Button>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-muted-foreground text-center py-8">
-              No recent lessons
-            </p>
-          )}
-        </CardContent>
-      </Card>
+              )
+            })()}
+          </CardContent>
+        </Card>
+      )}
     </div>
   )
 }
