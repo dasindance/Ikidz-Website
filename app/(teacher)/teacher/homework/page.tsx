@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge'
 import { useToast } from '@/hooks/use-toast'
 import { FileText, Plus } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
+import Link from 'next/link'
 
 async function fetchHomework() {
   const res = await fetch('/api/homework')
