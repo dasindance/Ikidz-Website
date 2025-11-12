@@ -41,6 +41,7 @@ export const config = {
     '/',
     '/parent/:path*',
     '/teacher/:path*',
+    '/admin/:path*',
   ],
 }
 

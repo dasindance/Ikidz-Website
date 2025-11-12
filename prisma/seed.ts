@@ -6,6 +6,21 @@ const prisma = new PrismaClient()
 async function main() {
   console.log('Starting database seed...')
 
+  // Create an admin account
+  const adminPassword = await bcrypt.hash('admin123', 10)
+  const admin = await prisma.user.upsert({
+    where: { email: 'admin@ikids.com' },
+    update: {},
+    create: {
+      email: 'admin@ikids.com',
+      name: 'iKids Admin',
+      password: adminPassword,
+      role: UserRole.ADMIN,
+    },
+  })
+
+  console.log('✓ Created admin account:', admin.email)
+
   // Create a teacher account
   const hashedPassword = await bcrypt.hash('teacher123', 10)
   const teacher = await prisma.user.upsert({
@@ -155,6 +170,7 @@ async function main() {
 
   console.log('\n✅ Database seeded successfully!')
   console.log('\nDemo Accounts:')
+  console.log('Admin: admin@ikids.com / admin123')
   console.log('Teacher: teacher@example.com / teacher123')
   console.log('Parent: parent@example.com / parent123')
 }

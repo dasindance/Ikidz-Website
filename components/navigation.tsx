@@ -16,6 +16,8 @@ import {
   Settings,
   Users,
   MessageSquare,
+  GraduationCap,
+  Shield,
 } from 'lucide-react'
 
 export function Navigation() {
@@ -24,28 +26,34 @@ export function Navigation() {
 
   if (!session) return null
 
+  const isAdmin = session.user.role === 'ADMIN'
   const isTeacher = session.user.role === 'TEACHER'
   const isParent = session.user.role === 'PARENT'
+
+  const adminLinks = [
+    { href: '/admin/dashboard', label: 'Dashboard', icon: Home },
+    { href: '/admin/users', label: 'Users', icon: Users },
+    { href: '/admin/classes', label: 'Classes', icon: BookOpen },
+    { href: '/admin/students', label: 'Students', icon: GraduationCap },
+    { href: '/admin/reports', label: 'Reports', icon: Settings },
+  ]
 
   const parentLinks = [
     { href: '/parent/dashboard', label: 'Dashboard', icon: Home },
     { href: '/parent/homework', label: 'Homework', icon: FileText },
     { href: '/parent/lessons', label: 'Lessons', icon: BookOpen },
     { href: '/parent/calendar', label: 'Calendar', icon: Calendar },
-    { href: '/parent/announcements', label: 'Announcements', icon: MessageSquare },
-    { href: '/parent/notifications', label: 'Notifications', icon: Bell },
+    { href: '/parent/announcements', label: 'Updates', icon: MessageSquare },
   ]
 
   const teacherLinks = [
     { href: '/teacher/admin', label: 'Dashboard', icon: Home },
     { href: '/teacher/post-lesson', label: 'Post Lesson', icon: BookOpen },
     { href: '/teacher/homework', label: 'Homework', icon: FileText },
-    { href: '/teacher/announcements', label: 'Announcements', icon: MessageSquare },
     { href: '/teacher/students', label: 'Students', icon: Users },
-    { href: '/teacher/calendar', label: 'Calendar', icon: Calendar },
   ]
 
-  const links = isTeacher ? teacherLinks : parentLinks
+  const links = isAdmin ? adminLinks : isTeacher ? teacherLinks : parentLinks
 
   return (
     <nav className="bg-white border-b shadow-sm">
@@ -83,8 +91,11 @@ export function Navigation() {
             </div>
           </div>
           <div className="flex items-center space-x-4">
-            <span className="text-sm text-gray-700">
-              {session.user.name} ({isTeacher ? 'Teacher' : 'Parent'})
+            <span className="text-sm text-gray-700 flex items-center gap-2">
+              {session.user.name}
+              {isAdmin && <Badge className="bg-ikids-purple text-white">Admin</Badge>}
+              {isTeacher && <Badge className="bg-ikids-blue text-white">Teacher</Badge>}
+              {isParent && <Badge className="bg-ikids-green text-white">Parent</Badge>}
             </span>
             <Button
               variant="ghost"

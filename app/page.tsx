@@ -10,7 +10,9 @@ export default async function HomePage() {
   }
 
   // Redirect based on role
-  if (session.user.role === 'TEACHER') {
+  if (session.user.role === 'ADMIN') {
+    redirect('/admin/dashboard')
+  } else if (session.user.role === 'TEACHER') {
     redirect('/teacher/admin')
   } else {
     redirect('/parent/dashboard')
