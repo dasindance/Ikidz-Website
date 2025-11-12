@@ -38,7 +38,9 @@ export function getPublicUrl(key: string): string {
 }
 
 export function validateFile(file: File): { valid: boolean; error?: string } {
-  const maxSize = 10 * 1024 * 1024 // 10MB
+  const isVideo = file.type.startsWith('video/')
+  const maxSize = isVideo ? 50 * 1024 * 1024 : 10 * 1024 * 1024 // 50MB for video, 10MB for others
+  
   const allowedTypes = [
     'application/pdf',
     'image/jpeg',
@@ -47,16 +49,26 @@ export function validateFile(file: File): { valid: boolean; error?: string } {
     'image/gif',
     'application/msword',
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    // Video formats
+    'video/mp4',
+    'video/quicktime', // .mov
+    'video/x-msvideo', // .avi
+    'video/webm',
   ]
 
   if (file.size > maxSize) {
-    return { valid: false, error: 'File size must be less than 10MB' }
+    return { 
+      valid: false, 
+      error: isVideo 
+        ? 'Video size must be less than 50MB' 
+        : 'File size must be less than 10MB' 
+    }
   }
 
   if (!allowedTypes.includes(file.type)) {
     return {
       valid: false,
-      error: 'Invalid file type. Allowed: PDF, Images, Word documents',
+      error: 'Invalid file type. Allowed: PDF, Images, Word documents, Videos (MP4, MOV, AVI, WebM)',
     }
   }
 

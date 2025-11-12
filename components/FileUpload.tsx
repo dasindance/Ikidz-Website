@@ -53,8 +53,11 @@ export function FileUpload({
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept,
-    maxSize,
+    accept: {
+      ...accept,
+      'video/*': ['.mp4', '.mov', '.avi', '.webm'],
+    },
+    maxSize: 50 * 1024 * 1024, // 50MB to support videos
     multiple: false,
   })
 
@@ -110,7 +113,7 @@ export function FileUpload({
           or click to browse
         </p>
         <p className="text-xs text-muted-foreground">
-          Supported: PDF, Images, Word (Max 10MB)
+          Supported: PDF, Images, Word, Videos (Max 50MB for videos)
         </p>
       </div>
       {error && (

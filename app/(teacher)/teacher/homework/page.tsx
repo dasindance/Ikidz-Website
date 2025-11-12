@@ -89,16 +89,32 @@ export default function TeacherHomeworkPage() {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Homework Assignments</h1>
-          <p className="text-muted-foreground mt-2">
-            Manage homework assignments and view submissions
-          </p>
-        </div>
-        <Button onClick={() => setShowForm(!showForm)}>
-          <Plus className="mr-2 h-4 w-4" />
-          New Assignment
+      <div className="text-center mb-8">
+        <h1 className="text-4xl font-display bg-gradient-ikids bg-clip-text text-transparent">
+          Homework Management 📝
+        </h1>
+        <p className="text-lg text-muted-foreground mt-2">
+          Create and manage homework assignments
+        </p>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 mb-8">
+        <Button 
+          onClick={() => setShowForm(!showForm)} 
+          className="h-20 btn-fun bg-gradient-ikids text-lg"
+        >
+          <div className="text-center">
+            <Plus className="h-8 w-8 mx-auto mb-1" />
+            <span>Single Assignment</span>
+          </div>
+        </Button>
+        <Button asChild className="h-20 btn-fun bg-ikids-purple text-white text-lg">
+          <Link href="/teacher/homework/bulk">
+            <div className="text-center">
+              <FileText className="h-8 w-8 mx-auto mb-1" />
+              <span>⚡ Bulk Distribution</span>
+            </div>
+          </Link>
         </Button>
       </div>
 
