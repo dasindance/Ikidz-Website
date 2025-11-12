@@ -28,8 +28,8 @@ export async function GET(req: NextRequest) {
       return NextResponse.json(students)
     }
 
-    // For teachers, get all students
-    if (session.user.role === 'TEACHER') {
+    // For teachers and admins, get all students
+    if (session.user.role === 'TEACHER' || session.user.role === 'ADMIN') {
       const students = await prisma.student.findMany({
         include: {
           parent: {
@@ -60,4 +60,5 @@ export async function GET(req: NextRequest) {
     )
   }
 }
+
 

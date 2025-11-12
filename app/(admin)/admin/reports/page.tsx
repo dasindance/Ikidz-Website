@@ -1,24 +1,72 @@
 'use client'
 
+import { useSession } from 'next-auth/react'
 import { useQuery } from '@tanstack/react-query'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { LoadingSpinner } from '@/components/LoadingSpinner'
+import { useRouter } from 'next/navigation'
 import { TrendingUp, Users, BookOpen, FileText, CheckCircle } from 'lucide-react'
 
 async function fetchReports() {
   const res = await fetch('/api/admin/reports')
-  if (!res.ok) throw new Error('Failed to fetch reports')
+  if (!res.ok) {
+    if (res.status === 401) {
+      throw new Error('Unauthorized - Please log in again')
+    }
+    throw new Error('Failed to fetch reports')
+  }
   return res.json()
 }
 
 export default function AdminReportsPage() {
-  const { data, isLoading } = useQuery({
+  const { data: session, status } = useSession()
+  const router = useRouter()
+  
+  const { data, isLoading, error } = useQuery({
     queryKey: ['admin-reports'],
     queryFn: fetchReports,
+    enabled: status === 'authenticated' && session?.user.role === 'ADMIN',
   })
 
-  if (isLoading) {
-    return <div>Loading...</div>
+  // Redirect if not authenticated or not admin
+  if (status === 'unauthenticated') {
+    router.push('/login')
+    return null
+  }
+
+  if (status === 'authenticated' && session?.user.role !== 'ADMIN') {
+    if (session?.user.role === 'TEACHER') {
+      router.push('/teacher/admin')
+    } else {
+      router.push('/parent/dashboard')
+    }
+    return null
+  }
+
+  if (status === 'loading' || isLoading) {
+    return <LoadingSpinner text="Loading reports..." />
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Card className="card-fun max-w-md">
+          <CardContent className="pt-6">
+            <p className="text-destructive text-center">
+              {error instanceof Error ? error.message : 'Failed to load reports'}
+            </p>
+            <Button
+              onClick={() => window.location.reload()}
+              className="w-full mt-4 btn-fun bg-gradient-ikids"
+            >
+              Retry
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
   }
 
   return (
@@ -138,4 +186,5 @@ export default function AdminReportsPage() {
     </div>
   )
 }
+
 

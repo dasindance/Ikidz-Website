@@ -11,15 +11,16 @@ export function Providers({ children }: { children: React.ReactNode }) {
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: 60 * 1000,
-            refetchOnWindowFocus: false,
+            staleTime: 30 * 1000, // Reduced from 60s to ensure fresher data
+            refetchOnWindowFocus: true, // Enable refetch on focus to catch session changes
+            retry: 1, // Retry failed requests once
           },
         },
       })
   )
 
   return (
-    <SessionProvider>
+    <SessionProvider refetchInterval={60} refetchOnWindowFocus={true}>
       <QueryClientProvider client={queryClient}>
         {children}
         <Toaster />
@@ -27,4 +28,5 @@ export function Providers({ children }: { children: React.ReactNode }) {
     </SessionProvider>
   )
 }
+
 

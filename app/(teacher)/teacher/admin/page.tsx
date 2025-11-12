@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { formatDate } from '@/lib/utils'
 import { UpcomingClasses } from '@/components/UpcomingClasses'
+import { LoadingSpinner } from '@/components/LoadingSpinner'
+import { useRouter } from 'next/navigation'
 import {
   BookOpen,
   FileText,
@@ -19,31 +21,77 @@ import Link from 'next/link'
 
 async function fetchDashboardData() {
   const res = await fetch('/api/teacher/dashboard')
-  if (!res.ok) throw new Error('Failed to fetch dashboard data')
+  if (!res.ok) {
+    if (res.status === 401) {
+      throw new Error('Unauthorized - Please log in again')
+    }
+    throw new Error('Failed to fetch dashboard data')
+  }
   return res.json()
 }
 
 async function fetchUpcomingClasses() {
   const res = await fetch('/api/upcoming-classes')
-  if (!res.ok) throw new Error('Failed to fetch upcoming classes')
+  if (!res.ok) {
+    if (res.status === 401) {
+      throw new Error('Unauthorized - Please log in again')
+    }
+    throw new Error('Failed to fetch upcoming classes')
+  }
   return res.json()
 }
 
 export default function TeacherAdminPage() {
-  const { data: session } = useSession()
-  const { data, isLoading } = useQuery({
+  const { data: session, status } = useSession()
+  const router = useRouter()
+  
+  const { data, isLoading, error } = useQuery({
     queryKey: ['teacher-dashboard'],
     queryFn: fetchDashboardData,
+    enabled: status === 'authenticated',
   })
 
   const { data: upcomingData } = useQuery({
     queryKey: ['upcoming-classes'],
     queryFn: fetchUpcomingClasses,
     refetchInterval: 60000, // Refresh every minute
+    enabled: status === 'authenticated',
   })
 
-  if (isLoading || !data) {
-    return <div>Loading...</div>
+  // Redirect if not authenticated
+  if (status === 'unauthenticated') {
+    router.push('/login')
+    return null
+  }
+
+  // Check role
+  if (status === 'authenticated' && session?.user.role !== 'TEACHER' && session?.user.role !== 'ADMIN') {
+    router.push('/parent/dashboard')
+    return null
+  }
+
+  if (status === 'loading' || isLoading || !data) {
+    return <LoadingSpinner text="Loading dashboard..." />
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Card className="card-fun max-w-md">
+          <CardContent className="pt-6">
+            <p className="text-destructive text-center">
+              {error instanceof Error ? error.message : 'Failed to load dashboard'}
+            </p>
+            <Button
+              onClick={() => window.location.reload()}
+              className="w-full mt-4 btn-fun bg-gradient-ikids"
+            >
+              Retry
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
   }
 
   return (

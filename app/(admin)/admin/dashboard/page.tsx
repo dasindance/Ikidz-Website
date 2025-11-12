@@ -5,6 +5,8 @@ import { useQuery } from '@tanstack/react-query'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { LoadingSpinner } from '@/components/LoadingSpinner'
+import { useRouter } from 'next/navigation'
 import {
   Users,
   GraduationCap,
@@ -17,19 +19,64 @@ import Link from 'next/link'
 
 async function fetchAdminDashboard() {
   const res = await fetch('/api/admin/dashboard')
-  if (!res.ok) throw new Error('Failed to fetch dashboard')
+  if (!res.ok) {
+    if (res.status === 401) {
+      throw new Error('Unauthorized - Please log in again')
+    }
+    throw new Error('Failed to fetch dashboard')
+  }
   return res.json()
 }
 
 export default function AdminDashboardPage() {
-  const { data: session } = useSession()
-  const { data, isLoading } = useQuery({
+  const { data: session, status } = useSession()
+  const router = useRouter()
+  
+  const { data, isLoading, error } = useQuery({
     queryKey: ['admin-dashboard'],
     queryFn: fetchAdminDashboard,
+    enabled: status === 'authenticated',
   })
 
-  if (isLoading || !data) {
-    return <div>Loading...</div>
+  // Redirect if not authenticated
+  if (status === 'unauthenticated') {
+    router.push('/login')
+    return null
+  }
+
+  // Check role
+  if (status === 'authenticated' && session?.user.role !== 'ADMIN') {
+    // Redirect based on actual role
+    if (session?.user.role === 'TEACHER') {
+      router.push('/teacher/admin')
+    } else {
+      router.push('/parent/dashboard')
+    }
+    return null
+  }
+
+  if (status === 'loading' || isLoading || !data) {
+    return <LoadingSpinner text="Loading admin dashboard..." />
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Card className="card-fun max-w-md">
+          <CardContent className="pt-6">
+            <p className="text-destructive text-center">
+              {error instanceof Error ? error.message : 'Failed to load dashboard'}
+            </p>
+            <Button
+              onClick={() => window.location.reload()}
+              className="w-full mt-4 btn-fun bg-gradient-ikids"
+            >
+              Retry
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
   }
 
   return (
@@ -159,4 +206,5 @@ export default function AdminDashboardPage() {
     </div>
   )
 }
+
 

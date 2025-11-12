@@ -22,8 +22,27 @@ import {
 } from 'lucide-react'
 
 export function Navigation() {
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
   const pathname = usePathname()
+
+  // Show loading state while session is being fetched
+  if (status === 'loading') {
+    return (
+      <nav className="bg-white border-b shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16 items-center">
+            <div className="flex items-center gap-2">
+              <div className="w-10 h-10 bg-gradient-ikids rounded-xl flex items-center justify-center text-white font-display text-lg">
+                iK
+              </div>
+              <span className="text-2xl font-display bg-gradient-ikids bg-clip-text text-transparent">iKids</span>
+            </div>
+            <div className="text-sm text-muted-foreground">Loading...</div>
+          </div>
+        </div>
+      </nav>
+    )
+  }
 
   if (!session) return null
 

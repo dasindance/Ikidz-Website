@@ -121,3 +121,4 @@ function calculateClassDates(startDate: Date, daysOfWeek: number[], numberOfClas
   return dates
 }
 
+
